@@ -1,0 +1,196 @@
+:root {
+  --gold:        #d4af37;
+  --gold-dim:    rgba(212, 175, 55, 0.12);
+  --gold-glow:   rgba(212, 175, 55, 0.25);
+  --bg:          #0e0e0e;
+  --surface-1:   #161616;
+  --surface-2:   #1e1e1e;
+  --surface-3:   #272727;
+  --border:      rgba(255, 255, 255, 0.06);
+  --border-gold: rgba(212, 175, 55, 0.35);
+  --text-1:      #f0f0f0;
+  --text-2:      #cfc9c9;
+  --text-3:      #cec1c1;
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'Syne', sans-serif;
+}
+
+.mainLayout {
+margin: 0;
+height: 100vh;
+width: 100vw;
+display: flex;
+font-family: "Segoe UI", sans-serif;
+background: var(--bg);
+color: var(--text-1);
+}
+
+label {
+  color: var(--gold);
+  font-family: var(--font-display);
+}
+
+.viga-regular {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3rem, 10vw, 8rem);
+  color: var(--gold);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 260px;
+  background: var(--surface-1);
+  border-right: 1px solid var(--border-gold);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* glow orb in sidebar */
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  left: -80px;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.sidebar h1 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+}
+
+.sidebar small {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+/* Main content */
+.main {
+flex: 1;
+padding: 3rem;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+/* ── Upload Card ── */
+.upload-card {
+  width: 100%;
+  max-width: 500px;
+  background: var(--surface-1);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 24px 60px rgba(0,0,0,0.5);
+  padding: 2.25rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* top shimmer line */
+.upload-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 15%; right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.5;
+}
+
+.upload-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 1px rgba(212,175,55,0.1) inset,
+    0 32px 80px rgba(0,0,0,0.6),
+    0 0 40px rgba(212,175,55,0.05);
+}
+
+.upload-card h5 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-1);
+  letter-spacing: 0.02em;
+  margin-bottom: 1.5rem;
+}
+
+.upload-card h5 span {
+  color: var(--gold);
+}
+
+input {
+border: 2px #adb5bd;
+border-radius: 0.5rem;
+padding: 1rem;
+width: 80%;
+transition: border-color 0.3s ease, background 0.3s ease;
+}
+.cardText {
+text-align: center;
+font-weight: 750;
+}
+input:hover {
+border-color: #007bff;
+background: #101112;
+}
+
+.errorText {
+color: #ffb4b4;
+margin: 0 0 1rem;
+font-size: 0.95rem;
+}
+
+.linkButton {
+background: transparent;
+border: none;
+color: var(--gold);
+font-weight: 600;
+margin-top: 1rem;
+padding: 0;
+}
+
+.linkButton:hover {
+text-decoration: underline;
+}
+
+/* Button */
+.btn-gradient {
+background-image: linear-gradient(135deg, #96f7fe 0%, #66a6ff 100%);
+border: none;
+color: white;
+font-weight: 600;
+border-radius: 0.5rem;
+padding: 0.6rem 1.2rem;
+width: 100%;
+box-shadow: 0 4px 12px rgba(0,176,155,0.3);
+transition: all 0.2s ease;
+}
+
+.btn-gradient:hover {
+background: linear-gradient(90deg, #00997f, #82b536);
+transform: translateY(-2px);
+box-shadow: 0 6px 15px rgba(0,176,155,0.4);
+}
