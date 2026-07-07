@@ -19,6 +19,7 @@ urlpatterns = [
 
     path('dashboard/', UserView.as_view(), name='user_view'),
     path('dashboard/fileUpload/', UploadView.as_view(), name='uploaded_view'),
+    path('runners/prediction/', RunnerPredictionView.as_view(), name='runner_prediction'),
 
     path('', include(router.urls))
 ]

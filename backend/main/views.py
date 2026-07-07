@@ -127,3 +127,31 @@ class RunnerView(ModelViewSet):
     
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
+
+class RunnerPredictionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        def predict_next_race_from_database(races, athlete, target_distance):
+            model = fit_athlete_performance_model(races, athlete)
+
+            pred = predict_time(model, target_distance)
+            return pred
+        file_id = request.query_params.get("file_id")
+        athlete = request.query_params.get("athlete")
+        distance = request.query_params.get("distance")
+
+        if not athlete:
+            return Response({"error": "Missing athlete"}, status=400)
+
+        races = Race.objects.filter(user=request.user, name=athlete)
+        if file_id:
+            races = races.filter(uploaded_file=file_id)
+
+        target_distance = safe_int(distance, None) if distance else None
+        prediction = predict_next_race_from_database(list(races), athlete, target_distance)
+
+        if prediction is None:
+            return Response({"error": "Not enough race data to predict"}, status=404)
+
+        return Response(prediction)

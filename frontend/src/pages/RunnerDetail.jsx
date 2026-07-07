@@ -20,51 +20,12 @@ function parseRaceDate(value) {
   return new Date(year, month - 1, day);
 }
 
-function predictNextRace(races) {
-  if (races.length === 0) return null;
-
-  const distanceCounts = races.reduce((counts, race) => {
-    counts[race.distance] = (counts[race.distance] || 0) + 1;
-    return counts;
-  }, {});
-
-  const targetDistance = Number(
-    Object.entries(distanceCounts).sort((a, b) => b[1] - a[1])[0][0]
-  );
-
-  const sameDistance = races
-    .filter((race) => race.distance === targetDistance)
-    .sort((a, b) => parseRaceDate(a.date) - parseRaceDate(b.date));
-
-  if (sameDistance.length === 1) {
-    return {
-      distance: targetDistance,
-      seconds: sameDistance[0].time_sec,
-      note: "Based on the only race at this distance so far.",
-    };
-  }
-
-  const n = sameDistance.length;
-  const xMean = (n - 1) / 2;
-  const yMean = sameDistance.reduce((sum, race) => sum + race.time_sec, 0) / n;
-  const denominator = sameDistance.reduce((sum, _race, index) => sum + (index - xMean) ** 2, 0);
-  const slope = denominator === 0
-    ? 0
-    : sameDistance.reduce((sum, race, index) => sum + (index - xMean) * (race.time_sec - yMean), 0) / denominator;
-  const predicted = yMean + slope * (n - xMean);
-
-  return {
-    distance: targetDistance,
-    seconds: Math.max(predicted, 1),
-    note: `Based on ${n} races at ${targetDistance}m.`,
-  };
-}
-
 export default function RunnerDetail() {
   const { athlete, file_id } = useParams();
   const navigate = useNavigate();
   const athleteName = decodeURIComponent(athlete);
   const [races, setRaces] = useState([]);
+  const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -72,7 +33,7 @@ export default function RunnerDetail() {
 
     const fetchData = async () => {
       try {
-        const res = await axios.get(
+        const raceRes = await axios.get(
           `http://localhost:8000/api/runnersviews/?file_id=${file_id}&athlete=${encodeURIComponent(athleteName)}`,
           {
             headers: {
@@ -82,8 +43,19 @@ export default function RunnerDetail() {
         );
 
         setRaces(
-          [...res.data].sort((a, b) => parseRaceDate(b.date) - parseRaceDate(a.date))
+          [...raceRes.data].sort((a, b) => parseRaceDate(b.date) - parseRaceDate(a.date))
         );
+
+        const predictionRes = await axios.get(
+          `http://localhost:8000/api/runners/prediction/?file_id=${file_id}&athlete=${encodeURIComponent(athleteName)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setPrediction(predictionRes.data);
       } catch (error) {
         console.log(error.response?.data || error);
       } finally {
@@ -93,8 +65,7 @@ export default function RunnerDetail() {
 
     fetchData();
   }, [athleteName, file_id]);
-
-  const prediction = useMemo(() => predictNextRace(races), [races]);
+  
   const bestRace = useMemo(
     () => races.reduce((best, race) => (!best || race.time_sec < best.time_sec ? race : best), null),
     [races]
@@ -147,9 +118,48 @@ export default function RunnerDetail() {
               </div>
               <div>
                 <p>Model</p>
-                <strong>Trend</strong>
+                <strong>{prediction.method}</strong>
               </div>
-              <p>{prediction.note}</p>
+              <div>
+                <p>Confidence</p>
+                <strong>{prediction.confidence}</strong>
+              </div>
+              <p>
+                Based on {prediction.sample_size} total races and {prediction.same_distance_count} at this distance.
+                Conditions used: {prediction.conditions.temperature}F, {prediction.conditions.humidity}% humidity,
+                {` ${prediction.conditions.elevation} elevation, ${prediction.conditions.surface}`}.
+              </p>
+            </div>
+          ) : (
+            <p>No races found for this athlete yet.</p>
+          )}
+        </div>
+
+        <div className={styles.card}>
+          <h2>Next Race Prediction</h2>
+          {prediction ? (
+            <div className={styles.predictionGrid}>
+              <div>
+                <p>Predicted Time</p>
+                <strong>{formatTime(prediction.seconds)}</strong>
+              </div>
+              <div>
+                <p>Distance</p>
+                <strong>{prediction.distance}m</strong>
+              </div>
+              <div>
+                <p>Model</p>
+                <strong>{prediction.method}</strong>
+              </div>
+              <div>
+                <p>Confidence</p>
+                <strong>{prediction.confidence}</strong>
+              </div>
+              <p>
+                Based on {prediction.sample_size} total races and {prediction.same_distance_count} at this distance.
+                Conditions used: {prediction.conditions.temperature}F, {prediction.conditions.humidity}% humidity,
+                {` ${prediction.conditions.elevation} elevation, ${prediction.conditions.surface}`}.
+              </p>
             </div>
           ) : (
             <p>No races found for this athlete yet.</p>

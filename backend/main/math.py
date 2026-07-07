@@ -121,7 +121,9 @@ def to_date_safe(date_str, default=None):
   - The Gascon Model is a model for predicting race times across different distances
   - A heuristic approach is taken if their is an insufficient amount of data to use the default model
  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-def fit_athlete_condition_model(runners, athlete, min_samples=4, alpha=1.0):
+
+
+def fit_athlete_performance_model(runners, athlete, min_samples=4, alpha=1.0):
     dist, temp, hum, elev, times = [], [], [], [], []
 
     for r in runners:
@@ -157,7 +159,7 @@ def fit_athlete_condition_model(runners, athlete, min_samples=4, alpha=1.0):
 
     return AthleteModel(coefs=coef, features=feature_names)
 
-def predict_time_with_conditions(model, distance, temp, humidity, elev, surface):
+def predict_time(model, distance, temp, humidity, elev, surface):
     """
     Predict the athlete's race time under the given conditions.
 
@@ -178,7 +180,7 @@ def predict_time_with_conditions(model, distance, temp, humidity, elev, surface)
 
     # Compute the predicted time using matrix multiplication:
     # prediction = Xβ
-    return float(X[0] @ model.coef_)
+    return float(X[0] @ model.coefs)
 
 def calculate_vdot(distance: float, time: float):
     """
