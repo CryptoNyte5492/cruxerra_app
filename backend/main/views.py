@@ -9,6 +9,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import get_object_or_404
 
 class RegisterView(APIView):
 
@@ -132,14 +133,14 @@ class RunnerPredictionView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        def predict_next_race_from_database(races, athlete, target_distance):
-            model = fit_athlete_performance_model(races, athlete)
-
-            pred = predict_time(model, target_distance)
-            return pred
         file_id = request.query_params.get("file_id")
         athlete = request.query_params.get("athlete")
-        distance = request.query_params.get("distance")
+        race_id = request.query_params.get("race_id")
+        if not race_id:
+            return Response(
+                {"error": "Missing race_id"},
+                status=400
+            )
 
         if not athlete:
             return Response({"error": "Missing athlete"}, status=400)
@@ -147,11 +148,26 @@ class RunnerPredictionView(APIView):
         races = Race.objects.filter(user=request.user, name=athlete)
         if file_id:
             races = races.filter(uploaded_file=file_id)
+        race = get_object_or_404(
+            races,
+            id=race_id
+        )
+        if race is None:
+            return Response(
+                {"error": "Race not found"},
+                status=404
+            )
+        distance = race.distance
+        elevation = race.elevation
+        humidity = race.humidity
+        surface = race.surface
+        temp = race.temperature
 
         target_distance = safe_int(distance, None) if distance else None
-        prediction = predict_next_race_from_database(list(races), athlete, target_distance)
+        model = fit_athlete_performance_model(races, athlete)
+        pred = predict_time(model,target_distance, temp, humidity, elevation, surface)
 
-        if prediction is None:
+        if pred is None:
             return Response({"error": "Not enough race data to predict"}, status=404)
 
-        return Response(prediction)
+        return Response(pred)

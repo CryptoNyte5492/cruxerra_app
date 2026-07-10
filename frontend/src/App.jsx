@@ -30,7 +30,7 @@ export default function App() {
             <RunnerList/>
           </ProtectedRoute>
         } />
-        <Route path="/runner/:file_id/:athlete" element={
+        <Route path="/runner/:file_id/:athlete/:race_id" element={
           <ProtectedRoute>
             <RunnerDetail/>
           </ProtectedRoute>

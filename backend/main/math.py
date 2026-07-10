@@ -230,9 +230,6 @@ def normalize_time(model, actual_time, temp, humidity, elev, surface):
 
     return actual_time - penalty
 
-def predict_time(model, distance_m):
-    pass
-
 def heuristic(time_sec, distance_m, temp_f, humidity, elevation_gain_m, athlete=None, runners=None):
 
     pass

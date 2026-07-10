@@ -21,7 +21,7 @@ function parseRaceDate(value) {
 }
 
 export default function RunnerDetail() {
-  const { athlete, file_id } = useParams();
+  const { athlete, file_id, race_id } = useParams();
   const navigate = useNavigate();
   const athleteName = decodeURIComponent(athlete);
   const [races, setRaces] = useState([]);
@@ -47,7 +47,7 @@ export default function RunnerDetail() {
         );
 
         const predictionRes = await axios.get(
-          `http://localhost:8000/api/runners/prediction/?file_id=${file_id}&athlete=${encodeURIComponent(athleteName)}`,
+          `http://localhost:8000/api/runners/prediction/?file_id=${file_id}&athlete=${encodeURIComponent(athleteName)}&race_id=${race_id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ export default function RunnerDetail() {
 
         <div className={styles["stat-card"]}>
           <p>Prediction</p>
-          <strong>{prediction ? formatTime(prediction.seconds) : "--"}</strong>
+          <strong>{prediction ? formatTime(prediction) : "--"}</strong>
           {prediction && <span>{prediction.distance}m</span>}
         </div>
       </aside>

@@ -204,7 +204,7 @@ export default function RunnerList () {
                 <tr
                   key={r.id}
                   className={styles.clickableRow}
-                  onClick={() => navigate(`/runner/${file_id}/${encodeURIComponent(r.name)}`)}
+                  onClick={() => navigate(`/runner/${file_id}/${encodeURIComponent(r.name)}/${r.id}`)}
                 >
                   <td>{r.name}</td>
                   <td>{r.event}</td>
