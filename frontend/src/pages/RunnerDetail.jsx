@@ -47,7 +47,7 @@ export default function RunnerDetail() {
         );
 
         const predictionRes = await axios.get(
-          `http://localhost:8000/api/runners/prediction/?file_id=${file_id}&athlete=${encodeURIComponent(athleteName)}&race_id=${race_id}`,
+          `http://localhost:8000/api/runners/prediction/?file_id=${file_id}&race_id=${race_id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -106,64 +106,7 @@ export default function RunnerDetail() {
 
         <div className={styles.card}>
           <h2>Next Race Prediction</h2>
-          {prediction ? (
-            <div className={styles.predictionGrid}>
-              <div>
-                <p>Predicted Time</p>
-                <strong>{formatTime(prediction.seconds)}</strong>
-              </div>
-              <div>
-                <p>Distance</p>
-                <strong>{prediction.distance}m</strong>
-              </div>
-              <div>
-                <p>Model</p>
-                <strong>{prediction.method}</strong>
-              </div>
-              <div>
-                <p>Confidence</p>
-                <strong>{prediction.confidence}</strong>
-              </div>
-              <p>
-                Based on {prediction.sample_size} total races and {prediction.same_distance_count} at this distance.
-                Conditions used: {prediction.conditions.temperature}F, {prediction.conditions.humidity}% humidity,
-                {` ${prediction.conditions.elevation} elevation, ${prediction.conditions.surface}`}.
-              </p>
-            </div>
-          ) : (
-            <p>No races found for this athlete yet.</p>
-          )}
-        </div>
-
-        <div className={styles.card}>
-          <h2>Next Race Prediction</h2>
-          {prediction ? (
-            <div className={styles.predictionGrid}>
-              <div>
-                <p>Predicted Time</p>
-                <strong>{formatTime(prediction.seconds)}</strong>
-              </div>
-              <div>
-                <p>Distance</p>
-                <strong>{prediction.distance}m</strong>
-              </div>
-              <div>
-                <p>Model</p>
-                <strong>{prediction.method}</strong>
-              </div>
-              <div>
-                <p>Confidence</p>
-                <strong>{prediction.confidence}</strong>
-              </div>
-              <p>
-                Based on {prediction.sample_size} total races and {prediction.same_distance_count} at this distance.
-                Conditions used: {prediction.conditions.temperature}F, {prediction.conditions.humidity}% humidity,
-                {` ${prediction.conditions.elevation} elevation, ${prediction.conditions.surface}`}.
-              </p>
-            </div>
-          ) : (
-            <p>No races found for this athlete yet.</p>
-          )}
+          {prediction}
         </div>
 
         <div className={styles.card}>
