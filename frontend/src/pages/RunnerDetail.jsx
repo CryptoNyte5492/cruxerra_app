@@ -47,7 +47,7 @@ export default function RunnerDetail() {
         );
 
         const predictionRes = await axios.get(
-          `http://localhost:8000/api/runners/prediction/?file_id=${file_id}&race_id=${race_id}`,
+          `http://localhost:8000/api/runners/prediction/?file_id=${file_id}&athlete=${athlete}&race_id=${race_id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -94,7 +94,6 @@ export default function RunnerDetail() {
         <div className={styles["stat-card"]}>
           <p>Prediction</p>
           <strong>{prediction ? formatTime(prediction) : "--"}</strong>
-          {prediction && <span>{prediction.distance}m</span>}
         </div>
       </aside>
 

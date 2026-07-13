@@ -48,7 +48,7 @@ def design_matrix(distance_list, temp_list, hum_list, elev_list, surface_list=No
         trail_flag = [0.0] * len(dist)
 
     ## Create matrix of coefficients for each feature => coeficient vector
-    X = np.column_stack({
+    X = np.column_stack([
         np.ones_like(logd),  # 1           
         logd,                # ln(d)
         logd**2,             # ln(d)^2
@@ -57,7 +57,7 @@ def design_matrix(distance_list, temp_list, hum_list, elev_list, surface_list=No
         elev_gain,
         grass_flag,          # G
         trail_flag           # T
-        })
+        ])
     feature_names = ["intercept", "logd", "logd2", "heat_above60", "hum_above60", "elev_gain", "grass", "trail"]
     return X, feature_names
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -127,15 +127,15 @@ def fit_athlete_performance_model(runners, athlete, min_samples=4, alpha=1.0):
     dist, temp, hum, elev, times = [], [], [], [], []
 
     for r in runners:
-        if r.get("Athlete").strip() != athlete.strip():
+        if r.name.strip() != athlete.strip():
             continue
-        d = to_float_safe(r.get("Distance (m)"))
-        t = to_float_safe(r.get("Temperature (F)"))
-        h = to_float_safe(r.get("Humidity (%)"))
-        e = to_float_safe(r.get("Elevation Gain"))
+        d = to_float_safe(r.distance)
+        t = to_float_safe(r.temperature)
+        h = to_float_safe(r.humidity)
+        e = to_float_safe(r.elevation)
         time_sec = None
         try:
-            time_sec = parse_time_to_seconds(r.get("Time", ""))
+            time_sec = parse_time_to_seconds(r.time_sec)
         except Exception:
             pass
         if d and d > 0 and t is not None and h is not None and e is not None and time_sec is not None:

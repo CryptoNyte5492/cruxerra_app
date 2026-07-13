@@ -164,8 +164,26 @@ class RunnerPredictionView(APIView):
         temp = race.temperature
 
         target_distance = safe_int(distance, None) if distance else None
-        model = fit_athlete_performance_model(races, athlete)
-        pred = predict_time(model,target_distance, temp, humidity, elevation, surface)
+        try:
+            model = fit_athlete_performance_model(races, athlete)
+            if model is None:
+                print("not working")
+                return Response(
+                    {"error": "Unable to build prediction model for this athlete."},
+                    status=400,
+                )
+            pred = predict_time(
+                model,
+                target_distance,
+                temp,
+                humidity,
+                elevation,
+                surface,
+            )
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response({"error": str(e)}, status=500)
 
         if pred is None:
             return Response({"error": "Not enough race data to predict"}, status=404)
