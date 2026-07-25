@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cruxerra
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - ./backend/.env              # create from .env.example, populate secrets locally
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app              # mount code for live reload
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+
+volumes:
+  db_data:
