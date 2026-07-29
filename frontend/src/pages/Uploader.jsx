@@ -6,6 +6,7 @@ import styles from "../components/Uploader.module.css";
 export default function Uploader () {
     const [user, setUser] = useState(null);
     const [files, setFiles] = useState([]);
+    const [oldFiles, setOldFiles] = useState([]);
     const navigate = useNavigate();
 
     // Run when the first component loads
@@ -19,6 +20,12 @@ export default function Uploader () {
             }
         // The data returned is the user's data in a readale format for the frontend
         }).then(res => {setUser(res.data)}).catch(err => {console.log(err);});
+        axios.get("http://localhost:8000/api/dashboard/files/", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        // The data returned is the user's data in a readale format for the frontend
+        }).then(res => {setOldFiles(res.data)}).catch(err => {console.log(err);});
     }, [] ) //<- This '[]' tells React to only run this once
 
     const handleFile = async (e) => {
@@ -58,7 +65,21 @@ export default function Uploader () {
         </div>
 
         <div>
-          <h2>Files Uploaded:</h2>
+          <h2>Files Uploaded</h2>
+
+          {uploadedFiles.length === 0 ? (
+            <p>No uploaded files yet.</p>
+          ) : (
+            uploadedFiles.map((file) => (
+              <button
+                key={file.id}
+                type="button"
+                onClick={() => navigate(`/runner/${file.id}`)}
+              >
+                {file.name}
+              </button>
+            ))
+          )}
         </div>
 
         <div>

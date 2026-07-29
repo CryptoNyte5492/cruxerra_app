@@ -2,7 +2,7 @@ from .models import *
 import csv, io
 from .math import *
 from rest_framework import status
-from .serializer import RegisterSerializer, UserSerializer, RaceSerializer
+from .serializer import RegisterSerializer, UserSerializer, RaceSerializer, FileSerializer
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -109,6 +109,13 @@ class UploadView(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
+class UploadedFileListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        files = UploadedFile.objects.filter(user=request.user).order_by("-uploaded")
+        return Response(FileSerializer(files, many=True).data)
         
 class RunnerView(ModelViewSet):
     serializer_class = RaceSerializer

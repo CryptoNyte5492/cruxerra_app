@@ -46,7 +46,7 @@ class UserSerializer(serializers.ModelSerializer):
 class FileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UploadedFile
-        fields = ['user', 'file', 'name', 'uploaded']
+        fields = ['id', 'name', 'uploaded']
 
 from rest_framework import serializers
 from .models import Race
