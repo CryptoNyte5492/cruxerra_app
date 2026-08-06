@@ -1,8 +1,12 @@
-FROM node:20
+# uses node
+FROM node:20 
 
+# app directory
 WORKDIR /app
 
+# copy information from package.json
 COPY frontend/package*.json ./
+# installs all the project's dependecies into node_modules
 RUN npm ci
 
 COPY frontend /app
