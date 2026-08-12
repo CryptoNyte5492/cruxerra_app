@@ -1,6 +1,6 @@
 name: Build Cruxerra Windows App
 
-on:
+'on':
   workflow_dispatch:
 
 jobs:
