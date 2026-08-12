@@ -3,17 +3,22 @@ const { spawn } = require("child_process");
 const path = require("path");
 
 let djangoProcess;
-let viteProcess;
 
 function startDjango() {
-    djangoProcess = spawn(
-        "python",
-        ["manage.py", "runserver"],
-        {
-            cwd: path.resolve(__dirname, "../../backend"),
-            shell: true
-        }
+    const backendPath = path.join(
+        process.resourcesPath,
+        "backend"
     );
+
+    const djangoExe = path.join(
+        backendPath,
+        "CruxerraBackend.exe"
+    );
+
+    djangoProcess = spawn(djangoExe, [], {
+        cwd: backendPath,
+        windowsHide: true
+    });
 
     djangoProcess.stdout.on("data", (data) => {
         console.log(`Django: ${data}`);
@@ -21,25 +26,6 @@ function startDjango() {
 
     djangoProcess.stderr.on("data", (data) => {
         console.error(`Django: ${data}`);
-    });
-}
-
-function startVite() {
-    viteProcess = spawn(
-        "npm",
-        ["run", "dev"],
-        {
-            cwd: path.resolve(__dirname, ".."),
-            shell: true
-        }
-    );
-
-    viteProcess.stdout.on("data", (data) => {
-        console.log(`Vite: ${data}`);
-    });
-
-    viteProcess.stderr.on("data", (data) => {
-        console.error(`Vite: ${data}`);
     });
 }
 
@@ -53,12 +39,25 @@ function createWindow() {
         }
     });
 
-    mainWindow.loadURL("http://localhost:5174");
-    mainWindow.webContents.openDevTools();
+    mainWindow.loadFile(
+        path.join(__dirname, "../dist/index.html")
+    );
+
+    // You can remove this before giving it to your coach.
+    // mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
     startDjango();
-    startVite();
     createWindow();
+});
+
+app.on("window-all-closed", () => {
+    if (djangoProcess) {
+        djangoProcess.kill();
+    }
+
+    if (process.platform !== "darwin") {
+        app.quit();
+    }
 });

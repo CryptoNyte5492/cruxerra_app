@@ -35,3 +35,9 @@ jobs:
       - name: Build React
         working-directory: frontend
         run: npm run build
+        
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cruxerra-Windows
+          path: backend/dist/

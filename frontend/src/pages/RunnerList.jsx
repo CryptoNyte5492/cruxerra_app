@@ -132,9 +132,6 @@ export default function RunnerList () {
             5K: {bestRaceInSpecificDistance(5000)?.name}
           </strong>
         </div>
-        <div className={styles["stat-card"]}>
-          <button onClick={navigate('dashboard/fileUpload/')}>BACK</button>
-        </div>
       </aside>
 
       {/* Main */}

@@ -196,14 +196,16 @@ export default function RunnerDetail() {
               </tr>
             </thead>
             <tbody>
-              {prediction.file_races.map((race) => (
+              {prediction?.file_races?.map((race) => (
                 <tr key={race.id}>
                   <td>{race.event}</td>
                   <td>{race.date}</td>
                   <td>{race.distance}m</td>
                   <td>{formatTime(race.time_sec)}</td>
                   <td>{race.surface}</td>
-                  <td>{race.temperature}F / {race.humidity}%</td>
+                  <td>
+                    {race.temperature}F / {race.humidity}%
+                  </td>
                 </tr>
               ))}
             </tbody>

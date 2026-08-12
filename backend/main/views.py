@@ -143,7 +143,10 @@ class RunnerPredictionView(APIView):
         file_id = request.query_params.get("file_id")
         athlete = request.query_params.get("athlete")
         race_id = request.query_params.get("race_id")
-        file_races = []
+
+        # -------------------------
+        # Validate parameters
+        # -------------------------
         if not race_id:
             return Response(
                 {"error": "Missing race_id"},
@@ -151,66 +154,135 @@ class RunnerPredictionView(APIView):
             )
 
         if not athlete:
-            return Response({"error": "Missing athlete"}, status=400)
+            return Response(
+                {"error": "Missing athlete"},
+                status=400
+            )
+
+        # -------------------------
+        # Find the selected race
+        # -------------------------
+        races = Race.objects.filter(user=request.user)
 
         if file_id:
             races = races.filter(uploaded_file=file_id)
+
         race = get_object_or_404(
             races,
             id=race_id
         )
-        if race is None:
-            return Response(
-                {"error": "Race not found"},
-                status=404
-            )
+
+        # -------------------------
+        # Get conditions from race
+        # -------------------------
         distance = race.distance
         elevation = race.elevation
         humidity = race.humidity
         surface = race.surface
         temp = race.temperature
 
-        target_distance = safe_int(distance, None) if distance else None
+        target_distance = safe_int(distance, None)
+        file_races = []
 
-        all_file_races = UploadedFile.objects.filter(user=request.user)
-        for file in all_file_races:
-            races = Race.objects.filter(user=request.user, uploaded_file=file)
-            file_races.extend(races)
-        # A prediction must only use races that happened before the selected
-        # race.  Including its recorded finish time leaks the answer into the
-        # estimate and makes the displayed "next race" result misleading.
+        all_files = UploadedFile.objects.filter(
+            user=request.user
+        )
+
+        for file in all_files:
+            races_in_file = Race.objects.filter(
+                user=request.user,
+                uploaded_file=file
+            )
+
+            file_races.extend(races_in_file)
         target_date = to_date_safe(race.date)
+
         training_races = [
-            candidate for candidate in file_races
-            if candidate.id != race.id
-            and (target_date is None or (to_date_safe(candidate.date) and to_date_safe(candidate.date) < target_date))
+            candidate
+            for candidate in file_races
+            if (
+                candidate.id != race.id
+                and (
+                    target_date is None
+                    or (
+                        to_date_safe(candidate.date) is not None
+                        and to_date_safe(candidate.date) < target_date
+                    )
+                )
+            )
         ]
+
         try:
-            model = fit_athlete_performance_model(training_races, athlete)
+            model = fit_athlete_performance_model(
+                training_races,
+                athlete
+            )
+
             if model is None:
                 return Response(
-                    {"error": "Unable to build prediction model for this athlete."},
-                    status=400,
+                    {
+                        "error": "Unable to build prediction model for this athlete."
+                    },
+                    status=400
                 )
-            pred = predict_time(model, target_distance, temp, humidity, elevation, surface)
-            # This is the model's forecast in ideal conditions, not the
-            # selected race's already-known result normalized after the fact.
-            ideal_time = ideal_time_for_distance(model, target_distance)
-            std_dev = model_residual_std(model, training_races, athlete)
-            history = athlete_progress_history(model, training_races, athlete, target_distance)
+
+            # Prediction under the selected race's conditions
+            pred = predict_time(
+                model,
+                target_distance,
+                temp,
+                humidity,
+                elevation,
+                surface
+            )
+
+            # Prediction under ideal conditions
+            ideal_time = ideal_time_for_distance(
+                model,
+                target_distance
+            )
+
+            # How much the athlete's performances vary
+            std_dev = model_residual_std(
+                model,
+                training_races,
+                athlete
+            )
+
+            # Progression history at this distance
+            history = athlete_progress_history(
+                model,
+                training_races,
+                athlete,
+                target_distance
+            )
+
         except Exception as e:
             import traceback
             traceback.print_exc()
-            return Response({"error": str(e)}, status=500)
 
+            return Response(
+                {"error": str(e)},
+                status=500
+            )
         if pred is None:
-            return Response({"error": "Not enough race data to predict"}, status=404)
-
+            return Response(
+                {"error": "Not enough race data to predict"},
+                status=404
+            )
         return Response({
-            "conditions": {"temp": temp, "humidity": humidity, "surface": surface},
+            "conditions": {
+                "temp": temp,
+                "humidity": humidity,
+                "surface": surface,
+                "elevation": elevation,
+            },
             "prediction": pred,
             "ideal_time": ideal_time,
             "std_dev": std_dev,
             "history": history,
-            "file_races": RaceSerializer(file_races, many=True).data
+            "file_races": RaceSerializer(
+                file_races,
+                many=True
+            ).data
         })
