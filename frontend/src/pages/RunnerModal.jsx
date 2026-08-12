@@ -1,5 +1,5 @@
 import { use, useEffect } from "react";
-import axios from "axios";
+import api from "../api";
 import styles from "../components/Model.module.css";
 
 export default function RaceModal({ race, file_id, athlete, onClose }) {
@@ -13,16 +13,16 @@ export default function RaceModal({ race, file_id, athlete, onClose }) {
         const fetch = async () => {
             const token = localStorage.getItem("access_token");
 
-            const res = axios.get(
-                `http://localhost:8000/api/runners/race-analysis/?file_id=${fileId}&athlete=${encodeURIComponent(athlete)}&race_id=${race.id}`,
+            const res = api.get(
+                `/api/runners/race-analysis/?file_id=${fileId}&athlete=${encodeURIComponent(athlete)}&race_id=${race.id}`,
                 {
                     headers: {
                             Authorization: `Bearer ${token}`,
                     }
                 }
             )
-            const pred = await axios.get(
-                `http://localhost:8000/api/runners/prediction/?file_id=${fileId}&athlete=${encodeURIComponent(athlete)}&race_id=${race.id}`,
+            const pred = await api.get(
+                `/api/runners/prediction/?file_id=${fileId}&athlete=${encodeURIComponent(athlete)}&race_id=${race.id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

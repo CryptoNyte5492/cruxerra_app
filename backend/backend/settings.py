@@ -71,6 +71,7 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:5174",
 ]
 
 SIMPLE_JWT = {
@@ -109,17 +110,11 @@ if database_url:
         raise ValueError("DATABASE_URL must use the postgres or postgresql scheme.")
 
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": parsed_database_url.path.lstrip("/"),
-            "USER": unquote(parsed_database_url.username or ""),
-            "PASSWORD": unquote(parsed_database_url.password or ""),
-            "HOST": parsed_database_url.hostname or "",
-            "PORT": str(parsed_database_url.port or 5432),
-            "CONN_MAX_AGE": 60,
-            "CONN_HEALTH_CHECKS": True,
-        }
-    }
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+                }
+                }
 else:
     DATABASES = {
         "default": {

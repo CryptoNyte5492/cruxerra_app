@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import styles from "../components/Runner.module.css"; 
 
 export default function RunnerList () {
@@ -43,7 +43,7 @@ export default function RunnerList () {
         const fetchData = async () => {
             try {
                 // Send a GET request to Django to retrieve the file's data
-                const res = await axios.get(`http://localhost:8000/api/runnersviews/?file_id=${file_id}`, {
+                const res = await api.get(`/api/runnersviews/?file_id=${file_id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -131,6 +131,9 @@ export default function RunnerList () {
           <strong>
             5K: {bestRaceInSpecificDistance(5000)?.name}
           </strong>
+        </div>
+        <div className={styles["stat-card"]}>
+          <button onClick={navigate('dashboard/fileUpload/')}>BACK</button>
         </div>
       </aside>
 

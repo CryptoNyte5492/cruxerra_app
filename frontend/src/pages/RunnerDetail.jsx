@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import styles from "../components/Runner.module.css";
 import ProgressChart from "../components/ProgressChart";
 
@@ -48,8 +48,8 @@ export default function RunnerDetail() {
 
     const fetchData = async () => {
       try {
-        const raceRes = await axios.get(
-          `http://localhost:8000/api/runnersviews/?file_id=${file_id}&athlete=${encodeURIComponent(athleteName)}`,
+        const raceRes = await api.get(
+          `/api/runnersviews/?file_id=${file_id}&athlete=${encodeURIComponent(athleteName)}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -61,8 +61,8 @@ export default function RunnerDetail() {
           [...raceRes.data].sort((a, b) => parseRaceDate(b.date) - parseRaceDate(a.date))
         );
 
-        const predictionRes = await axios.get(
-          `http://localhost:8000/api/runners/prediction/?file_id=${file_id}&athlete=${athlete}&race_id=${race_id}`,
+        const predictionRes = await api.get(
+          `/api/runners/prediction/?file_id=${file_id}&athlete=${athlete}&race_id=${race_id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -196,7 +196,7 @@ export default function RunnerDetail() {
               </tr>
             </thead>
             <tbody>
-              {races.map((race) => (
+              {prediction.file_races.map((race) => (
                 <tr key={race.id}>
                   <td>{race.event}</td>
                   <td>{race.date}</td>

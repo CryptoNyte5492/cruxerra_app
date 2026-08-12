@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from "../components/Home.module.css";
-import axios from 'axios';
+import api from "../api";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -22,7 +22,7 @@ export default function Home() {
         try {
 
             // Sends a POST (create) request to Django
-            const res = await axios.post("http://localhost:8000/api/auth/register/", {
+            const res = await api.post("/api/auth/register/", {
                 first_name: fname,
                 last_name: lname,
                 email,

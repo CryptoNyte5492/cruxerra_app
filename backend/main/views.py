@@ -143,6 +143,7 @@ class RunnerPredictionView(APIView):
         file_id = request.query_params.get("file_id")
         athlete = request.query_params.get("athlete")
         race_id = request.query_params.get("race_id")
+        file_races = []
         if not race_id:
             return Response(
                 {"error": "Missing race_id"},
@@ -152,7 +153,6 @@ class RunnerPredictionView(APIView):
         if not athlete:
             return Response({"error": "Missing athlete"}, status=400)
 
-        races = Race.objects.filter(user=request.user, name=athlete)
         if file_id:
             races = races.filter(uploaded_file=file_id)
         race = get_object_or_404(
@@ -171,12 +171,17 @@ class RunnerPredictionView(APIView):
         temp = race.temperature
 
         target_distance = safe_int(distance, None) if distance else None
+
+        all_file_races = UploadedFile.objects.filter(user=request.user)
+        for file in all_file_races:
+            races = Race.objects.filter(user=request.user, uploaded_file=file)
+            file_races.extend(races)
         # A prediction must only use races that happened before the selected
         # race.  Including its recorded finish time leaks the answer into the
         # estimate and makes the displayed "next race" result misleading.
         target_date = to_date_safe(race.date)
         training_races = [
-            candidate for candidate in races
+            candidate for candidate in file_races
             if candidate.id != race.id
             and (target_date is None or (to_date_safe(candidate.date) and to_date_safe(candidate.date) < target_date))
         ]
@@ -207,4 +212,5 @@ class RunnerPredictionView(APIView):
             "ideal_time": ideal_time,
             "std_dev": std_dev,
             "history": history,
+            "file_races": RaceSerializer(file_races, many=True).data
         })

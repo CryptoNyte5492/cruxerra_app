@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import styles from "../components/Uploader.module.css";
 
 export default function Uploader () {
@@ -14,13 +14,13 @@ export default function Uploader () {
         // Obtain user's access JWT token to access user's data
         const token = localStorage.getItem("access_token");
         // Send GET request with user token to Django's view and serializer to authorize and get back user's data
-        axios.get("http://localhost:8000/api/dashboard/", {
+        api.get("/api/dashboard/", {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         // The data returned is the user's data in a readale format for the frontend
         }).then(res => {setUser(res.data)}).catch(err => {console.log(err);});
-        axios.get("http://localhost:8000/api/dashboard/files/", {
+        api.get("/api/dashboard/files/", {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -42,7 +42,7 @@ export default function Uploader () {
         try
         {
             // Submit file to django' 
-            const res = await axios.post("http://localhost:8000/api/dashboard/fileUpload/", formData, {
+            const res = await api.post("/api/dashboard/fileUpload/", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -67,10 +67,10 @@ export default function Uploader () {
         <div>
           <h2>Files Uploaded</h2>
 
-          {uploadedFiles.length === 0 ? (
+          {oldFiles.length === 0 ? (
             <p>No uploaded files yet.</p>
           ) : (
-            uploadedFiles.map((file) => (
+            oldFiles.map((file) => (
               <button
                 key={file.id}
                 type="button"
