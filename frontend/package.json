@@ -7,6 +7,9 @@
   "build": {
     "appId": "com.cruxerra.app",
     "productName": "Cruxerra",
+    "directories": {
+      "output": "release"
+    },
     "files": [
         "electron/**",
         "dist/**",
@@ -18,14 +21,14 @@
             "to": "backend"
         }
     ]
-},
+  },
   "scripts": {
     "dev": "vite",
     "electron": "electron .",
     "build": "vite build && electron-builder",
     "lint": "eslint .",
     "preview": "vite preview"
-},
+  },
   "dependencies": {
     "axios": "^1.17.0",
     "bootstrap": "^5.3.8",

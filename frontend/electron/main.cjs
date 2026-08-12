@@ -1,10 +1,14 @@
 const { app, BrowserWindow } = require("electron");
 const { spawn } = require("child_process");
 const path = require("path");
+const fs = require("fs");
 
 let djangoProcess;
 
 function startDjango() {
+    const userDataPath = path.join(app.getPath("userData"), "backend-data");
+    fs.mkdirSync(userDataPath, { recursive: true });
+
     const backendPath = path.join(
         process.resourcesPath,
         "backend"
@@ -17,7 +21,11 @@ function startDjango() {
 
     djangoProcess = spawn(djangoExe, [], {
         cwd: backendPath,
-        windowsHide: true
+        windowsHide: true,
+        env: {
+            ...process.env,
+            CRUXERRA_DATA_DIR: userDataPath,
+        },
     });
 
     djangoProcess.stdout.on("data", (data) => {
