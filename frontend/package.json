@@ -5,23 +5,20 @@
   "type": "module",
   "main": "electron/main.cjs",
   "build": {
-    "appId": "com.cruxerra.app",
-    "productName": "Cruxerra",
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-        "electron/**",
-        "dist/**",
-        "package.json"
-    ],
-    "extraResources": [
-        {
-            "from": "../backend/dist/CruxerraBackend",
-            "to": "backend"
-        }
-    ]
-  },
+  "appId": "com.cruxerra.app",
+  "productName": "Cruxerra",
+  "files": [
+    "electron/**",
+    "dist/**",
+    "package.json"
+  ],
+  "extraResources": [
+  {
+    "from": "../backend/dist",
+    "to": "backend"
+  }
+]
+},
   "scripts": {
     "dev": "vite",
     "electron": "electron .",

@@ -1,31 +1,25 @@
 const { app, BrowserWindow } = require("electron");
 const { spawn } = require("child_process");
 const path = require("path");
-const fs = require("fs");
 
 let djangoProcess;
 
 function startDjango() {
-    const userDataPath = path.join(app.getPath("userData"), "backend-data");
-    fs.mkdirSync(userDataPath, { recursive: true });
+    const backendName =
+        process.platform === "win32"
+            ? "CruxerraBackend.exe"
+            : "cruxerra-backend";
 
     const backendPath = path.join(
         process.resourcesPath,
-        "backend"
+        "backend",
+        backendName
     );
 
-    const djangoExe = path.join(
-        backendPath,
-        "CruxerraBackend.exe"
-    );
+    console.log("Starting Django:", backendPath);
 
-    djangoProcess = spawn(djangoExe, [], {
-        cwd: backendPath,
-        windowsHide: true,
-        env: {
-            ...process.env,
-            CRUXERRA_DATA_DIR: userDataPath,
-        },
+    djangoProcess = spawn(backendPath, [], {
+        shell: false
     });
 
     djangoProcess.stdout.on("data", (data) => {
@@ -34,6 +28,10 @@ function startDjango() {
 
     djangoProcess.stderr.on("data", (data) => {
         console.error(`Django: ${data}`);
+    });
+
+    djangoProcess.on("error", (error) => {
+        console.error("Failed to start Django:", error);
     });
 }
 
@@ -48,11 +46,10 @@ function createWindow() {
     });
 
     mainWindow.loadFile(
-        path.join(__dirname, "../dist/index.html")
+        path.join(app.getAppPath(), "dist", "index.html")
     );
 
-    // You can remove this before giving it to your coach.
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
