@@ -1,6 +1,6 @@
 name: Build Cruxerra Windows App
 
-'on':
+on:
   workflow_dispatch:
 
 jobs:
@@ -28,16 +28,16 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
-      - name: Build Django backend executable
+      - name: Build Django executable
         working-directory: backend
         run: |
-          pyinstaller --noconfirm --clean --onedir --name CruxerraBackend --paths . --collect-all main --collect-all backend run_server.py
+          pyinstaller --onefile --name CruxerraBackend launcher.py
 
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
 
-      - name: Package Windows app
+      - name: Build and package Electron app
         working-directory: frontend
         run: npm run build
 
@@ -45,5 +45,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Cruxerra-Windows
-          path: frontend/release/**
-          if-no-files-found: error
+          path: frontend/dist/*.exe
