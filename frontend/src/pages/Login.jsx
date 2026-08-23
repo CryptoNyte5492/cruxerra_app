@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 export default function Login() {
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ export default function Login() {
             const res = await api.post(
                 "/api/auth/token/",
                 {
-                    username,
+                    email,
                     password
                 }
             )
@@ -42,7 +42,7 @@ export default function Login() {
         }
 
         catch (error) {
-            setError("Username or password is incorrect.");
+            setError("Email or password is incorrect.");
             console.log(error.response?.data || error);
         }
         finally {
@@ -66,14 +66,14 @@ export default function Login() {
                     </div>
                     <form onSubmit={loginUser}>
                         <div className="mb-3">
-                            <label htmlFor="username" className="form-label">Username</label>
+                            <label htmlFor="email" className="form-label">Email</label>
                             <input
-                                id="username"
+                                id="email"
                                 className="form-control"
-                                type="text"
-                                placeholder="Username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
+                                type="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 required
                             />
                         </div>

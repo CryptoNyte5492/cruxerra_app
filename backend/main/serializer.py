@@ -1,8 +1,6 @@
 from rest_framework import serializers
 from .models import *
 import random
-from django.core.mail import send_mail
-from django.conf import settings
 
 # User = get_user_model()  Dyanmic and flexible way of obtaining User model
 
@@ -29,12 +27,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         print(username)
         validated_data["username"] = username
         user = User.objects.create_user(**validated_data)
-
-        try:
-            send_mail("Your Username", f"Your username is {username}", settings.DEFAULT_FROM_EMAIL, [user.email])
-            print('✅ Email sent successfully!')
-        except Exception as e:
-            print(e)
 
         return user
 

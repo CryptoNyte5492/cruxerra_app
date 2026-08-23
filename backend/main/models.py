@@ -3,6 +3,11 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
+    # Desktop installs are commonly used without outbound email configured.
+    # Let coaches sign in with the address they provided instead of a generated
+    # username that would otherwise have to be emailed to them.
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
 
 class UploadedFile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -27,4 +32,4 @@ class Race(models.Model):
     temperature = models.IntegerField()
 
     def __str__(self):
-        return f"{self.name} - {self.event}"  
+        return f"{self.name} - {self.event}"
