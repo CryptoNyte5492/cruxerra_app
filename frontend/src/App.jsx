@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { HashRouter, Navigate, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Uploader from "./pages/Uploader";
 import RunnerList from "./pages/RunnerList";
@@ -17,7 +17,7 @@ function ProtectedRoute({children}) {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/register" element={<Home/>} />
         <Route path="/login" element={<Login />} />
@@ -37,6 +37,6 @@ export default function App() {
         } />
         <Route path="*" element={<Navigate to="/login" />} /> {/** Redirect to login page for any non-valid url */}
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
