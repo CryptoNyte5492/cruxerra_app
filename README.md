@@ -25,6 +25,9 @@ The generated `backend/dist/CruxerraBackend.exe` must be built on Windows. A
 Mac executable cannot run on Windows, and PyInstaller does not cross-compile
 it reliably.
 
+The script requires Python 3.12. Check that it is installed with
+`py -3.12 --version` before building.
+
 ## First use
 
 The coach creates an account and uploads CSVs. Sign in uses the email address

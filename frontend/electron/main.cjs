@@ -1,9 +1,17 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, dialog } = require("electron");
 const { spawn } = require("child_process");
 const path = require("path");
 const http = require("http");
+const fs = require("fs");
 
 let djangoProcess;
+let backendLogPath;
+
+function logBackend(message) {
+    const line = `[${new Date().toISOString()}] ${message}\n`;
+    console.log(line.trim());
+    fs.appendFileSync(backendLogPath, line, "utf8");
+}
 
 function startDjango() {
     const backendName =
@@ -16,7 +24,12 @@ function startDjango() {
         : path.join(__dirname, "..", "..", "backend", "dist");
     const backendPath = path.join(backendDirectory, backendName);
 
-    console.log("Starting Django:", backendPath);
+    logBackend(`Starting backend: ${backendPath}`);
+
+    if (!fs.existsSync(backendPath)) {
+        logBackend("ERROR: Backend executable was not found.");
+        return;
+    }
 
     djangoProcess = spawn(backendPath, [], {
         shell: false,
@@ -29,20 +42,20 @@ function startDjango() {
     });
 
     djangoProcess.stdout.on("data", (data) => {
-        console.log(`Django: ${data}`);
+        logBackend(`Django: ${data}`);
     });
 
     djangoProcess.stderr.on("data", (data) => {
-        console.error(`Django: ${data}`);
+        logBackend(`Django error: ${data}`);
     });
 
     djangoProcess.on("error", (error) => {
-    console.error("Failed to start Django:", error);
-});
+        logBackend(`ERROR: Failed to start backend: ${error.stack || error}`);
+    });
 
-djangoProcess.on("exit", (code, signal) => {
-    console.log(`Django exited. Code: ${code}, Signal: ${signal}`);
-});
+    djangoProcess.on("exit", (code, signal) => {
+        logBackend(`Backend exited (code: ${code}, signal: ${signal || "none"}).`);
+    });
 }
 
 function waitForBackend(timeoutMs = 30000) {
@@ -89,11 +102,19 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
+    backendLogPath = path.join(app.getPath("userData"), "backend.log");
+    logBackend("Cruxerra started.");
     startDjango();
     try {
         await waitForBackend();
     } catch (error) {
-        console.error(error);
+        logBackend(`ERROR: ${error.message}`);
+        dialog.showErrorBox(
+            "Cruxerra could not start",
+            `The local server did not start.\n\nPlease send this log file to the developer:\n${backendLogPath}`
+        );
+        app.quit();
+        return;
     }
     createWindow();
 });
