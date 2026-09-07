@@ -37,8 +37,12 @@ function startDjango() {
     });
 
     djangoProcess.on("error", (error) => {
-        console.error("Failed to start Django:", error);
-    });
+    console.error("Failed to start Django:", error);
+});
+
+djangoProcess.on("exit", (code, signal) => {
+    console.log(`Django exited. Code: ${code}, Signal: ${signal}`);
+});
 }
 
 function waitForBackend(timeoutMs = 30000) {

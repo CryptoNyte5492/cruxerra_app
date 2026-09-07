@@ -28,10 +28,19 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
-      - name: Build Django executable
+            - name: Build Django executable
         working-directory: backend
         run: |
           pyinstaller --onefile --name CruxerraBackend launcher.py
+
+      - name: Verify Django executable
+        working-directory: backend
+        run: |
+          dir dist
+          if (!(Test-Path "dist/CruxerraBackend.exe")) {
+            Write-Error "CruxerraBackend.exe was not created!"
+            exit 1
+          }
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -41,8 +50,16 @@ jobs:
         working-directory: frontend
         run: npm run build
 
+      - name: Verify packaged backend
+        working-directory: frontend
+        run: |
+          if (!(Test-Path "release/win-unpacked/resources/backend/CruxerraBackend.exe")) {
+            Write-Error "CruxerraBackend.exe was not included in the Electron package!"
+            exit 1
+          }
+
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
           name: Cruxerra-Windows
-          path: frontend/dist/*.exe
+          path: frontend/release/*.exe
